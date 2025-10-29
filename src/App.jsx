@@ -9,6 +9,7 @@ import Cart from './components/cart/Cart'
 import SearchData from './components/searchdata/SearchData'
 import Kanban from './components/kanban/Kanban'
 import WebSocketChat from './components/chat/WebSocketChat'
+import ToDoList from './components/todolist/ToDoList'
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -26,6 +27,7 @@ function App() {
           <Route path='/searchdata' element={<SearchData/>}/>
           <Route path='/kanban' element={<Kanban/>}/>
           <Route path='/chat' element={<WebSocketChat/>}/>
+          <Route path='/todolist' element={<ToDoList/>}/>
         </Routes>
       </BrowserRouter>
     </div>

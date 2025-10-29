@@ -17,6 +17,7 @@ function Header() {
         <Link to="/searchdata">SearchData</Link>
         <Link to="/kanban">Kanban</Link>
         <Link to="/chat">Web Socket</Link>
+        <Link to="/todolist">To do List</Link>
       </nav>
       <button onClick={() => toggleTheme()}>Toggle theme</button>
     </div>
