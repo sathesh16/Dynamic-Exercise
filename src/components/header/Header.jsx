@@ -14,6 +14,7 @@ function Header() {
         <Link to="/cart">Cart</Link>
         <Link to="/datatable">Datatable</Link>
         <Link to="/upload">Image Upload</Link>
+        <Link to="/searchdata">SearchData</Link>
       </nav>
       <button onClick={() => toggleTheme()}>Toggle theme</button>
     </div>

@@ -6,6 +6,7 @@ import ImagesUpload from './components/imagesUpload/ImagesUpload'
 import DataGrid from './components/datagrid/DataGrid'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import Cart from './components/cart/Cart'
+import SearchData from './components/searchdata/SearchData'
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -20,6 +21,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/datatable" element={<DataGrid />} />
           <Route path='/upload' element={<ImagesUpload />} />
+          <Route path='/searchdata' element={<SearchData/>}/>
         </Routes>
       </BrowserRouter>
     </div>
