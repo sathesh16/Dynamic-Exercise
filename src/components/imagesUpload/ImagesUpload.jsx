@@ -38,14 +38,14 @@ export default function ImagesUpload() {
     const handleDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsDragging(false);
+        setIsDragging(false); //for bordercolor
         handleFiles(e.dataTransfer.files);
     };
 
     const handleDragOver = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsDragging(true);
+        setIsDragging(true); //for bordercolor
     };
 
     const handleDragLeave = (e) => {
