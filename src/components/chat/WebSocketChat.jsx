@@ -36,7 +36,7 @@ function WebSocketChat() {
 
     return (
         <div style={{ maxWidth: "400px", margin: "30px auto", textAlign: "center" }}>
-            <h2>💬 WebSocket Chat</h2>
+            <h2>WebSocket Chat</h2>
             <div
                 style={{
                     border: "1px solid #ccc",

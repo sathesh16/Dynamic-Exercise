@@ -1,160 +1,153 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-
-// ✅ TableRow Component — memoized to avoid unnecessary re-renders
-const TableRow = React.memo(({ user }) => (
-  <tr>
-    <td>{user.id}</td>
-    <td>{user.name}</td>
-    <td>{user.username}</td>
-    <td>{user.email}</td>
-    <td>{user.address.city}</td>
-  </tr>
-));
+import React, { useState, useEffect } from "react";
 
 const DataGrid = () => {
-  // 🔹 State variables
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]); // all data from API
+  const [filteredData, setFilteredData] = useState([]); // data after search/filter
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
   const rowsPerPage = 5;
 
-  // 🔹 Fetch API Data
+  //  Fetch Data from API
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((res) => res.json())
-      .then((json) => setData(json))
-      .catch((err) => console.error("Fetch error:", err));
+    const fetchData = async () => {
+      const response = await fetch("https://jsonplaceholder.typicode.com/users");
+      const json = await response.json();
+      setData(json);
+      setFilteredData(json);
+    };
+    fetchData();
   }, []);
 
-  // 🔹 Handle sorting logic
-  const handleSort = useCallback((columnKey) => {
-    setSortConfig((prev) => {
-      if (prev.key === columnKey && prev.direction === "ascending") {
-        return { key: columnKey, direction: "descending" };
+  //  Handle Search (Global Filter) by array.filter function with string includes
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+
+    // Filter across all columns
+    const filtered = data.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value).toLowerCase().includes(term)
+      )
+    );
+
+    setFilteredData(filtered);
+    setCurrentPage(1); // reset pagination
+  };
+
+  //  Sorting Logic
+  const handleSort = (columnKey) => {
+    let direction = "ascending";
+
+    // Toggle direction if same column is clicked again
+    if (sortConfig.key === columnKey && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+
+    const sorted = [...filteredData].sort((a, b) => {
+      const aValue = a[columnKey];
+      const bValue = b[columnKey];
+
+      //Ascending order logic
+      if (direction === "ascending") {
+        if (aValue < bValue) return -1; //(a,b)
+        if (aValue > bValue) return 1; //(b,a)
+        return 0; //same position
       }
-      return { key: columnKey, direction: "ascending" };
-    });
-  }, []);
 
-  // 🔹 Derived data (filtered + sorted + paginated)
-  const processedData = useMemo(() => {
-    let filteredData = [...data];
-
-    // 1️⃣ Filter/Search (case-insensitive across all columns)
-    if (searchTerm.trim() !== "") {
-      const lower = searchTerm.toLowerCase();
-      filteredData = filteredData.filter((user) =>
-        Object.values(user).some((value) =>
-          typeof value === "object"
-            ? JSON.stringify(value).toLowerCase().includes(lower)
-            : String(value).toLowerCase().includes(lower)
-        )
-      );
-    }
-
-    // 2️⃣ Sorting
-    if (sortConfig.key) {
-      filteredData.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-
-        if (aValue < bValue) return sortConfig.direction === "ascending" ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === "ascending" ? 1 : -1;
+      // Descending order logic
+      else {
+        if (aValue < bValue) return 1;
+        if (aValue > bValue) return -1;
         return 0;
-      });
-    }
+      }
+    });
 
-    return filteredData;
-  }, [data, searchTerm, sortConfig]);
+    setFilteredData(sorted);
+    setSortConfig({ key: columnKey, direction });
+  };
 
-  // 3️⃣ Pagination
-  const totalPages = Math.ceil(processedData.length / rowsPerPage);
+
+  // ✅ Pagination Logic
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentRows = processedData.slice(startIndex, startIndex + rowsPerPage);
+  const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
 
-  // 🔹 Handle page changes
-  const handlePageChange = useCallback((page) => setCurrentPage(page), []);
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2>React Data Grid (No Libraries)</h2>
+    <div style={{ padding: "30px", fontFamily: "sans-serif" }}>
+      <h2>Sorting + Search + Pagination</h2>
 
-      {/* 🔍 Search box */}
+      {/* 🔍 Search Input */}
       <input
         type="text"
         placeholder="Search across all columns..."
         value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-          setCurrentPage(1); // reset to first page
-        }}
+        onChange={handleSearch}
         style={{
           marginBottom: "15px",
           padding: "8px",
           width: "300px",
-          borderRadius: "5px",
           border: "1px solid #ccc",
+          borderRadius: "4px",
         }}
       />
 
-      {/* 📋 Table */}
+      {/* 🧾 Table */}
       <table
         border="1"
         cellPadding="10"
-        style={{ borderCollapse: "collapse", width: "100%", textAlign: "left" }}
+        style={{ borderCollapse: "collapse", width: "100%" }}
       >
         <thead>
           <tr>
-            <th onClick={() => handleSort("id")}>ID</th>
             <th onClick={() => handleSort("name")}>
-              Name{" "}
-              {sortConfig.key === "name"
-                ? sortConfig.direction === "ascending"
-                  ? "🔼"
-                  : "🔽"
-                : ""}
+              Name {sortConfig.key === "name" ? (sortConfig.direction === "ascending" ? "(asc)" : "(desc)") : ""}
             </th>
             <th onClick={() => handleSort("username")}>
-              Username{" "}
-              {sortConfig.key === "username"
-                ? sortConfig.direction === "ascending"
-                  ? "🔼"
-                  : "🔽"
-                : ""}
+              Username {sortConfig.key === "username" ? (sortConfig.direction === "ascending" ? "(asc)" : "(desc)") : ""}
             </th>
             <th>
               Email
             </th>
-            <th onClick={() => handleSort("address")}>City</th>
+            <th>City</th>
           </tr>
         </thead>
         <tbody>
-          {currentRows.length > 0 ? (
-            currentRows.map((user) => <TableRow key={user.id} user={user} />)
+          {paginatedData.length > 0 ? (
+            paginatedData.map((user) => (
+              <tr key={user.id}>
+                <td>{user.name}</td>
+                <td>{user.username}</td>
+                <td>{user.email}</td>
+                <td>{user.address.city}</td>
+              </tr>
+            ))
           ) : (
             <tr>
-              <td colSpan="5" style={{ textAlign: "center", color: "#888" }}>
-                No matching data found
+              <td colSpan="4" style={{ textAlign: "center" }}>
+                No results found
               </td>
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* 🔢 Pagination */}
-      <div style={{ marginTop: "15px", textAlign: "center" }}>
-        {[...Array(totalPages)].map((_, index) => (
+
+      <div style={{ marginTop: "15px" }}>
+        {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index}
             onClick={() => handlePageChange(index + 1)}
             style={{
-              padding: "6px 10px",
-              margin: "0 3px",
+              margin: "2px",
+              padding: "6px 12px",
+              border: "1px solid #ccc",
+              background: "#000",
               borderRadius: "4px",
-              border: currentPage === index + 1 ? "2px solid #000" : "1px solid #ccc",
-              backgroundColor: currentPage === index + 1 ? "#eee" : "#fff",
               cursor: "pointer",
             }}
           >

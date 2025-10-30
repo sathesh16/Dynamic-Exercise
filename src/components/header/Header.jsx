@@ -6,7 +6,7 @@ import { BrowserRouter, Link, Route, Routes } from 'react-router'
 import Cart from '../cart/Cart'
 import DataGrid from '../datagrid/DataGrid'
 function Header() {
-  const { theme, toggleTheme } = useContext(ThemeContext)
+  const {  toggleTheme } = useContext(ThemeContext)
   return (
     <div className='header'>
       <img src={viteLogo} alt="vite logo" />

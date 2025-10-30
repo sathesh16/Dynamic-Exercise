@@ -57,7 +57,7 @@ function Kanban() {
         });
     };
 
-    const handleDragOver = (e) => e.preventDefault();
+    const handleDragOver = (e) => e.preventDefault(); //just avoiding default action
 
     return (
         <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "repeat(3,1fr)", maxWidth: "800px", justifyContent: "center" }}>

@@ -16,10 +16,6 @@ export default function ImagesUpload() {
                 setError(`${file.name} is larger than 2 MB`);
                 return false;
             }
-            if (!file.type.startsWith("image/")) {
-                setError(`${file.name} is not an image`);
-                return false;
-            }
             return true;
         });
 
@@ -77,7 +73,7 @@ export default function ImagesUpload() {
                         <input
                             type="file"
                             multiple
-                            accept="image/*"
+                            accept=".jpg, .png"
                             onChange={handleImageChange}
                             className="hidden"
                         />
